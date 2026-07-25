@@ -946,7 +946,7 @@ public static class ClientHandlers
         var total = await query.CountAsync(ct);
         var items = await query
             .Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(c => ClientResponse.From(c))
+            .Select(c => new ClientResponse(c.Id, c.Name, c.Email, c.Address, c.CreatedAt))
             .ToListAsync(ct);
 
         return new PagedResult<ClientResponse>(items, page, pageSize, total);
@@ -1025,7 +1025,7 @@ public static class CategoryHandlers
     {
         return await db.Categories.AsNoTracking()
             .OrderBy(c => c.Name)
-            .Select(c => CategoryResponse.From(c))
+            .Select(c => new CategoryResponse(c.Id, c.Name))
             .ToListAsync(ct);
     }
 
@@ -1149,7 +1149,7 @@ public static class ExpenseHandlers
         var total = await query.CountAsync(ct);
         var items = await query
             .Skip((page - 1) * pageSize).Take(pageSize)
-            .Select(e => ExpenseResponse.From(e))
+            .Select(e => new ExpenseResponse(e.Id, e.CategoryId, e.Description, e.Amount, e.Date, e.Vendor, e.CreatedAt))
             .ToListAsync(ct);
 
         return new PagedResult<ExpenseResponse>(items, page, pageSize, total);
