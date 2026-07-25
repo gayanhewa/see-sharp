@@ -60,4 +60,13 @@ public class InvoiceTests
         invoice.MarkAsSent();
         Assert.Throws<InvalidInvoiceTransitionException>(() => invoice.MarkAsSent());
     }
+
+    [Fact]
+    public void UpdateDetails_AfterSent_Throws()
+    {
+        var invoice = NewDraft();
+        invoice.MarkAsSent();
+        Assert.Throws<InvalidOperationException>(
+            () => invoice.UpdateDetails("INV-002", new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 31), null));
+    }
 }

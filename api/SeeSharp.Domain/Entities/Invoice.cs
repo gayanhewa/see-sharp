@@ -84,4 +84,18 @@ public sealed class Invoice
             throw new InvalidInvoiceTransitionException(Status, InvoiceStatus.Cancelled);
         Status = InvoiceStatus.Cancelled;
     }
+
+    public void UpdateDetails(string number, DateOnly issueDate, DateOnly dueDate, string? notes)
+    {
+        if (Status != InvoiceStatus.Draft)
+            throw new InvalidOperationException("Only draft invoices can be edited.");
+        if (string.IsNullOrWhiteSpace(number))
+            throw new ArgumentException("Invoice number is required.", nameof(number));
+        if (dueDate < issueDate)
+            throw new ArgumentException("Due date cannot be before issue date.", nameof(dueDate));
+        Number = number.Trim();
+        IssueDate = issueDate;
+        DueDate = dueDate;
+        Notes = notes?.Trim();
+    }
 }
