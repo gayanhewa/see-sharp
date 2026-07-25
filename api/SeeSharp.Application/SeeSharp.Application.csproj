@@ -4,4 +4,9 @@
     <ProjectReference Include="..\SeeSharp.Domain\SeeSharp.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+  </ItemGroup>
+
 </Project>
