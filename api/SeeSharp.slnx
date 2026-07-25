@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SeeSharp.Api/SeeSharp.Api.csproj" />
+  <Project Path="SeeSharp.Application/SeeSharp.Application.csproj" />
+  <Project Path="SeeSharp.Domain/SeeSharp.Domain.csproj" />
+  <Project Path="SeeSharp.Infrastructure/SeeSharp.Infrastructure.csproj" />
+</Solution>

@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SeeSharp.Application\SeeSharp.Application.csproj" />
+  </ItemGroup>
+
+</Project>
