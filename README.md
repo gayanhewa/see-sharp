@@ -95,6 +95,15 @@ dotnet test
 Runs the domain unit tests and the API integration tests. The integration
 tests use Testcontainers, so Docker must be running.
 
+The SPA has Playwright end-to-end tests. They need the API and Postgres
+running (the quick start above covers that), plus a one-time browser install:
+
+```bash
+cd web
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## Ports
 
 | Port | What |
