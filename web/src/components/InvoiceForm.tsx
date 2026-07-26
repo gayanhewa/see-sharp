@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Client, Invoice, LineItem } from "../api/types";
+import type { Client, Invoice } from "../api/types";
 
 export interface InvoiceFormData {
   clientId?: string;
