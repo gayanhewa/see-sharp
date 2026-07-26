@@ -39,10 +39,10 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 // Endpoint groups are mapped here by later tasks:
 app.MapClients();
-// app.MapCategories();
-// app.MapExpenses();
-// app.MapInvoices();
-// app.MapReports();
+app.MapCategories();
+app.MapExpenses();
+app.MapInvoices();
+app.MapReports();
 
 using (var scope = app.Services.CreateScope())
 {
