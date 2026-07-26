@@ -16,5 +16,35 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    container_name: seesharp-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__AppDb: "Host=postgres;Port=5432;Database=seesharp;Username=seesharp;Password=seesharp"
+      Auth__Token: "dev-secret-token"
+      Otel__Endpoint: "http://host.docker.internal:4317"
+      Cors__AllowedOrigins__0: "http://localhost:8081"
+    ports:
+      - "5080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    build:
+      context: ../web
+      dockerfile: Dockerfile
+    container_name: seesharp-web
+    depends_on:
+      - api
+    ports:
+      - "8081:80"
+
 volumes:
   seesharp-pgdata:
