@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: seesharp-postgres
+    environment:
+      POSTGRES_USER: seesharp
+      POSTGRES_PASSWORD: seesharp
+      POSTGRES_DB: seesharp
+    ports:
+      - "5432:5432"
+    volumes:
+      - seesharp-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seesharp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  seesharp-pgdata:
