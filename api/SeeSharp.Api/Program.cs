@@ -1,5 +1,6 @@
 using FluentValidation;
 using SeeSharp.Api.Auth;
+using SeeSharp.Api.Endpoints;
 using SeeSharp.Application.Clients;
 using SeeSharp.Infrastructure;
 using SeeSharp.Infrastructure.Persistence;
@@ -37,7 +38,7 @@ app.UseMiddleware<TokenAuthMiddleware>();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 // Endpoint groups are mapped here by later tasks:
-// app.MapClients();
+app.MapClients();
 // app.MapCategories();
 // app.MapExpenses();
 // app.MapInvoices();
