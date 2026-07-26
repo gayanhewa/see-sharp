@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  dotnet-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore SeeSharp.slnx
+        working-directory: api
+
+      - name: Test (unit + integration with Testcontainers)
+        run: dotnet test
+        working-directory: api
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: seesharp
+          POSTGRES_PASSWORD: seesharp
+          POSTGRES_DB: seesharp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seesharp"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Start the API (migrates and seeds Postgres)
+        run: |
+          export ConnectionStrings__AppDb="Host=localhost;Port=5432;Database=seesharp;Username=seesharp;Password=seesharp"
+          export Auth__Token="dev-secret-token"
+          export ASPNETCORE_URLS="http://localhost:5080"
+          nohup dotnet run --project SeeSharp.Api --no-launch-profile > api.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:5080/health && exit 0
+            sleep 2
+          done
+          echo "API did not start" && cat api.log && exit 1
+        working-directory: api
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+        working-directory: web
+
+      - name: Run Playwright e2e tests
+        run: npm run test:e2e
+        working-directory: web
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
