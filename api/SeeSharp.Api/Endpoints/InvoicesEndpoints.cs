@@ -2,6 +2,7 @@ using FluentValidation;
 using SeeSharp.Application.Abstractions;
 using SeeSharp.Application.Invoices;
 using SeeSharp.Domain.Enums;
+using SeeSharp.Infrastructure.Telemetry;
 
 namespace SeeSharp.Api.Endpoints;
 
@@ -32,10 +33,12 @@ public static class InvoicesEndpoints
         });
 
         group.MapPost("/", async (
-            IAppDbContext db, IValidator<CreateInvoiceRequest> validator, CreateInvoiceRequest req, CancellationToken ct) =>
+            IAppDbContext db, IValidator<CreateInvoiceRequest> validator, AppMetrics metrics,
+            CreateInvoiceRequest req, CancellationToken ct) =>
         {
             await validator.ValidateAndThrowAsync(req, ct);
             var created = await InvoiceHandlers.CreateAsync(db, req, ct);
+            metrics.InvoiceCreated();
             return Results.Created($"/invoices/{created.Id}", created);
         });
 
@@ -50,7 +53,12 @@ public static class InvoicesEndpoints
         group.MapPost("/{id:guid}/status", async (
             IAppDbContext db, Guid id, ChangeStatusRequest req, CancellationToken ct) =>
         {
+            using var activity = AppTelemetry.ActivitySource.StartActivity("invoice.status_change");
+            activity?.SetTag("invoice.id", id);
+            activity?.SetTag("invoice.target_status", req.Status);
+
             var updated = await InvoiceHandlers.ChangeStatusAsync(db, id, req.Status, ct);
+            activity?.SetTag("invoice.found", updated is not null);
             return updated is null ? Results.NotFound() : Results.Ok(updated);
         });
 

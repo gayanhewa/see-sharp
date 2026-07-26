@@ -4,6 +4,7 @@ using SeeSharp.Api.Endpoints;
 using SeeSharp.Application.Clients;
 using SeeSharp.Infrastructure;
 using SeeSharp.Infrastructure.Persistence;
+using SeeSharp.Infrastructure.Telemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("AppDb")
     ?? throw new InvalidOperationException("ConnectionStrings:AppDb is not configured.");
 
 builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddSeeSharpTelemetry(builder.Configuration, "see-sharp-api");
 builder.Services.AddValidatorsFromAssemblyContaining<CreateClientRequestValidator>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
