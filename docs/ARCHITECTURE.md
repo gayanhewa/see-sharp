@@ -23,7 +23,7 @@ Three moving parts plus observability:
 | `api/` | The C# solution: four projects, two test projects, the Dockerfile |
 | `web/` | The React single-page app (Vite, TypeScript, React Router) |
 | `deploy/` | Docker Compose for Postgres, the API, and the web, plus the SigNoz stack |
-| `docs/` | Design spec, implementation plan, and this tour |
+| `docs/` | This tour |
 
 ## The four API projects
 
