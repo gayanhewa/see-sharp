@@ -23,18 +23,21 @@ public static class InvoiceHandlers
     public static async Task<InvoiceResponse?> UpdateAsync(
         IAppDbContext db, Guid id, UpdateInvoiceRequest req, CancellationToken ct)
     {
-        var invoice = await db.Invoices
-            .Include(i => i.LineItems)
-            .FirstOrDefaultAsync(i => i.Id == id, ct);
+        var invoice = await db.Invoices.FirstOrDefaultAsync(i => i.Id == id, ct);
         if (invoice is null) return null;
 
         invoice.UpdateDetails(req.Number, req.IssueDate, req.DueDate, req.Notes);
-        invoice.ClearLineItems();
+
+        var existingLineItems = await db.InvoiceLineItems.Where(li => li.InvoiceId == id).ToListAsync(ct);
+        db.InvoiceLineItems.RemoveRange(existingLineItems);
+
         foreach (var li in req.LineItems)
-            invoice.AddLineItem(li.Description, li.Quantity, li.UnitPrice);
+            db.InvoiceLineItems.Add(InvoiceLineItem.Create(invoice.Id, li.Description, li.Quantity, li.UnitPrice));
 
         await db.SaveChangesAsync(ct);
-        return InvoiceResponse.From(invoice);
+
+        invoice = await db.Invoices.AsNoTracking().Include(i => i.LineItems).FirstOrDefaultAsync(i => i.Id == id, ct);
+        return invoice is null ? null : InvoiceResponse.From(invoice);
     }
 
     public static async Task<bool> DeleteAsync(IAppDbContext db, Guid id, CancellationToken ct)
