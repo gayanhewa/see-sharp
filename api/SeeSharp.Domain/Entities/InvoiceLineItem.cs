@@ -12,7 +12,7 @@ public sealed class InvoiceLineItem
 
     private InvoiceLineItem() { }
 
-    internal static InvoiceLineItem Create(Guid invoiceId, string description, int quantity, decimal unitPrice)
+    public static InvoiceLineItem Create(Guid invoiceId, string description, int quantity, decimal unitPrice)
     {
         if (string.IsNullOrWhiteSpace(description))
             throw new ArgumentException("Line item description is required.", nameof(description));
