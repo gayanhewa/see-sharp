@@ -2,8 +2,11 @@ const BASE = "/api";
 const TOKEN = import.meta.env.VITE_API_TOKEN ?? "dev-secret-token";
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  status: number;
+
+  constructor(status: number, message: string) {
     super(message);
+    this.status = status;
   }
 }
 
